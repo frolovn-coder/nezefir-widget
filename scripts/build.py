@@ -166,7 +166,9 @@ def main() -> int:
         + json.dumps(data, ensure_ascii=False, separators=(',', ':'))
         + '</script>'
     )
-    new_html, n = pattern.subn(inline, html, count=1)
+    # ВАЖНО: lambda вместо строки-замены, иначе re.subn интерпретирует \n / \1
+    # внутри inline JSON как backreferences и превращает в реальные newlines.
+    new_html, n = pattern.subn(lambda _m: inline, html, count=1)
     if n == 0:
         print(
             'ОШИБКА: в index.html не найден placeholder <script id="data">. '
