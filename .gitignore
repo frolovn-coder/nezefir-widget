@@ -1,0 +1,20 @@
+# build artifacts
+dist/
+
+# секреты — НИКОГДА в репо
+service_account.json
+*.pem
+*.key
+
+# python
+__pycache__/
+*.pyc
+.venv/
+
+# OS
+.DS_Store
+.idea/
+.vscode/
+
+# локальные настройки Claude Code
+.claude/

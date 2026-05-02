@@ -1,0 +1,44 @@
+name: build & deploy nezefir widget
+
+on:
+  # ручной запуск
+  workflow_dispatch:
+
+  # пуш в main: пересобирает и катит
+  push:
+    branches: [main]
+
+  # cron каждые 15 минут — авто-обновление при правках в Google Sheet
+  # (плюс проценты по кредитам пересчитываются каждый день автоматически)
+  schedule:
+    - cron: '*/15 * * * *'
+
+  # внешний триггер от бота / другого webhook'а если понадобится
+  repository_dispatch:
+    types: [sheet-changed]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        run: pip install --quiet gspread google-auth
+
+      - name: Build dist/ from Google Sheets
+        env:
+          GOOGLE_SA_JSON: ${{ secrets.GOOGLE_SA_JSON }}
+        run: python3 scripts/build.py
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=nezefir-widget --branch=main

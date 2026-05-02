@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>НЕЗЕФИР — Долги</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  /* ──────────────────────────────────────────────────────────────────────
+     LINTU BRAND PALETTE
+     • Electric Blue #393BC7 — главный
+     • Graphite      #2C2C38 — тёмный фон
+     • Lavender      #D8DCFF — мягкий фон
+     • Cream         #FDEDEC — тёплый акцент-фон
+     • Periwinkle    #8C98FF — вторичный
+     • Coral         #FF8A65 — предупреждения / проценты
+  ────────────────────────────────────────────────────────────────────── */
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:           #ffffff;
+    --bg-alt:       #D8DCFF;
+    --bg-cream:     #FDEDEC;
+    --primary:      #393BC7;
+    --primary-soft: #8C98FF;
+    --graphite:     #2C2C38;
+    --text:         #2C2C38;
+    --text-soft:    #6B6B7C;
+    --line:         #ECECF3;
+    --coral:        #FF8A65;
+    --green:        #00b67a;
+    --bg-on-primary: #ffffff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:           #2C2C38;
+      --bg-alt:       #393BC7;
+      --bg-cream:     #3A3A48;
+      --primary:      #8C98FF;
+      --primary-soft: #393BC7;
+      --graphite:     #ffffff;
+      --text:         #ffffff;
+      --text-soft:    #A8A8B8;
+      --line:         #3A3A48;
+      --coral:        #FF8A65;
+      --green:        #4ADE80;
+      --bg-on-primary: #ffffff;
+    }
+  }
+
+  /* Telegram WebView не всегда передаёт системную prefers-color-scheme,
+     поэтому дублируем через body.dark — выставляется в JS из tg.colorScheme */
+  body.dark {
+    --bg:           #2C2C38;
+    --bg-alt:       #393BC7;
+    --bg-cream:     #3A3A48;
+    --primary:      #8C98FF;
+    --primary-soft: #393BC7;
+    --graphite:     #ffffff;
+    --text:         #ffffff;
+    --text-soft:    #A8A8B8;
+    --line:         #3A3A48;
+    --coral:        #FF8A65;
+    --green:        #4ADE80;
+    --bg-on-primary: #ffffff;
+  }
+  body.light {
+    --bg:           #ffffff;
+    --bg-alt:       #D8DCFF;
+    --bg-cream:     #FDEDEC;
+    --primary:      #393BC7;
+    --primary-soft: #8C98FF;
+    --graphite:     #2C2C38;
+    --text:         #2C2C38;
+    --text-soft:    #6B6B7C;
+    --line:         #ECECF3;
+    --coral:        #FF8A65;
+    --green:        #00b67a;
+    --bg-on-primary: #ffffff;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Helvetica Neue", "Inter", -apple-system, BlinkMacSystemFont, "Arial", sans-serif;
+    font-size: 15px;
+    line-height: 1.3;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+  }
+
+  .wrap {
+    padding: 0 0 64px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ─── HEADER ──────────────────────────────────────────────────────── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .logo {
+    font-size: 13px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--graphite);
+  }
+  .logo .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    margin-right: 6px;
+    transform: translateY(-1px);
+    border-radius: 50%;
+  }
+  .top-bar .live {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-soft);
+  }
+  .top-bar .live::before {
+    content: "●";
+    color: var(--coral);
+    margin-right: 4px;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.3; } }
+
+  /* ─── HERO — главный блок с суммой долгов ────────────────────────── */
+  .hero {
+    padding: 48px 24px 40px;
+    background: var(--bg-alt);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    right: -40px;
+    width: 200px;
+    height: 200px;
+    background: var(--primary-soft);
+    opacity: 0.25;
+    border-radius: 50%;
+    filter: blur(20px);
+  }
+  .hero-content { position: relative; z-index: 1; }
+  .hero-label {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--primary);
+    margin-bottom: 16px;
+  }
+  .hero-amount {
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--graphite);
+  }
+  .hero-amount .currency {
+    font-size: 28px;
+    font-weight: 700;
+    margin-left: 4px;
+    vertical-align: top;
+    position: relative;
+    top: 6px;
+    color: var(--primary);
+  }
+  .hero-sub {
+    margin-top: 14px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-soft);
+  }
+  .hero-sub .num {
+    color: var(--coral);
+    font-weight: 900;
+  }
+  /* Прогресс-бейдж в углу hero — % погашено от общей суммы */
+  .hero-progress {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 64px;
+    z-index: 2;
+    text-align: center;
+  }
+  .hero-ring {
+    width: 56px;
+    height: 56px;
+    display: block;
+    margin: 0 auto;
+    transform: rotate(-90deg);
+  }
+  .hero-ring-bg {
+    fill: none;
+    stroke: rgba(255,255,255,0.55);
+    stroke-width: 2.5;
+  }
+  .hero-ring-fill {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.6s ease;
+  }
+  .hero-progress-pct {
+    position: absolute;
+    top: 17px;
+    left: 0;
+    right: 0;
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--graphite);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .hero-progress-label {
+    margin-top: 6px;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    color: var(--primary);
+    text-transform: uppercase;
+  }
+
+  /* ─── ACTIONS ─────────────────────────────────────────────────────── */
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .action {
+    /* Дефолт = вторичная кнопка («Помочь») — кремовый фон, коралловая нижняя полоса */
+    background: var(--bg-cream);
+    color: var(--graphite);
+    border: none;
+    border-bottom: 4px solid var(--coral);
+    padding: 26px 18px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.15s, transform 0.1s, border-color 0.15s;
+  }
+  .action:active {
+    background: var(--bg-alt);
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+  .action.primary {
+    background: var(--primary);
+    color: var(--bg-on-primary);
+    border-bottom-color: var(--graphite);
+  }
+  .action.primary:active {
+    background: var(--graphite);
+    border-bottom-color: var(--primary);
+  }
+  .action .arrow {
+    font-size: 22px;
+    font-weight: 700;
+    transition: transform 0.2s;
+  }
+  .action:active .arrow { transform: translateX(4px); }
+
+  /* ─── STATS ROW ───────────────────────────────────────────────────── */
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--line);
+  }
+  .stat {
+    padding: 24px 20px;
+    border-right: 1px solid var(--line);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-label {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-soft);
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--graphite);
+  }
+  .stat-value.small { font-size: 22px; }
+  .stat-value.accent { color: var(--primary); }
+  .stat-meta {
+    margin-top: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-soft);
+  }
+
+  /* ─── SECTION HEADERS ─────────────────────────────────────────────── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 32px 20px 16px;
+  }
+  .section-title {
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    color: var(--graphite);
+  }
+  .section-counter {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-soft);
+  }
+  .section-counter .pill {
+    background: var(--primary);
+    color: var(--bg-on-primary);
+    padding: 3px 8px;
+    margin-right: 4px;
+    border-radius: 4px;
+  }
+
+  /* ─── ITEM ROWS ───────────────────────────────────────────────────── */
+  .item-row {
+    display: flex;
+    align-items: stretch;
+    padding: 18px 20px;
+    border-top: 1px solid var(--line);
+    gap: 16px;
+    transition: background 0.15s;
+  }
+  .item-row:last-child { border-bottom: 1px solid var(--line); }
+  .item-row:active { background: var(--bg-cream); }
+
+  .item-marker {
+    width: 4px;
+    background: var(--primary);
+    flex-shrink: 0;
+    border-radius: 2px;
+  }
+  .item-marker.loan    { background: var(--primary); }
+  .item-marker.credit  { background: var(--coral); }
+  .item-marker.static  { background: var(--primary-soft); }
+  .item-marker.payment { background: var(--green); }
+  .item-marker.closed  { background: var(--text-soft); }
+
+  .item-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+  }
+  .item-name {
+    font-size: 16px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    color: var(--graphite);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .item-meta {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--text-soft);
+  }
+
+  .item-amount-col {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+  }
+  .item-amount {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--graphite);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .item-amount.green { color: var(--green); }
+  .item-amount.coral { color: var(--coral); }
+  .item-accrued {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--coral);
+  }
+
+  .item-row.closed { opacity: 0.55; }
+  .item-row.closed .item-name { text-decoration: line-through; }
+
+  /* ─── EMPTY STATE ─────────────────────────────────────────────────── */
+  .empty-state {
+    padding: 48px 24px;
+    text-align: center;
+  }
+  .empty-state .big {
+    font-size: 28px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+    color: var(--graphite);
+  }
+  .empty-state .big .accent-bg {
+    background: var(--primary);
+    color: var(--bg-on-primary);
+    padding: 0 8px;
+    border-radius: 4px;
+  }
+  .empty-state .small {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--primary);
+  }
+
+  /* ─── ERROR STATE ─────────────────────────────────────────────────── */
+  .error-state {
+    padding: 96px 24px;
+    text-align: center;
+  }
+  .error-state .err-mark {
+    display: inline-block;
+    background: var(--coral);
+    color: var(--graphite);
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 20px;
+    border-radius: 4px;
+  }
+  .error-state p {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.5;
+    color: var(--text-soft);
+  }
+
+  /* ─── FOOTER ──────────────────────────────────────────────────────── */
+  .footer {
+    padding: 32px 20px 24px;
+    text-align: center;
+    border-top: 1px solid var(--line);
+    margin-top: 24px;
+  }
+  .footer-mark {
+    font-size: 24px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    color: var(--graphite);
+  }
+  .footer-mark .accent-bg {
+    background: var(--primary);
+    color: var(--bg-on-primary);
+    padding: 0 6px;
+    border-radius: 3px;
+  }
+  .footer-tag {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-soft);
+  }
+  .footer a { color: inherit; text-decoration: none; }
+
+  /* ─── LOADING ─────────────────────────────────────────────────────── */
+  .skeleton-hero {
+    padding: 48px 24px 40px;
+    background: var(--bg-alt);
+  }
+  .skeleton-line {
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    height: 12px;
+    margin-bottom: 12px;
+    border-radius: 4px;
+    background-color: var(--primary-soft);
+    opacity: 0.3;
+  }
+  .skeleton-big {
+    height: 48px;
+    width: 70%;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ─── ACCENT BAR ──────────────────────────────────────────────────── */
+  .accent-bar {
+    height: 4px;
+    background: var(--primary);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app">
+  <div class="top-bar">
+    <div class="logo"><span class="dot"></span>НЕЗЕФИР · ДОЛГИ</div>
+    <div class="live">LIVE</div>
+  </div>
+  <div class="skeleton-hero">
+    <div class="skeleton-line" style="width: 40%; height: 10px;"></div>
+    <div class="skeleton-line skeleton-big"></div>
+    <div class="skeleton-line" style="width: 60%; height: 10px;"></div>
+  </div>
+</div>
+
+<script id="data" type="application/json">{}</script>
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const DEBT_BOT_USERNAME = 'nezefir_debt_bot';
+
+// ─── TG INIT ──────────────────────────────────────────────────────────────────
+const tg = window.Telegram?.WebApp;
+
+function applyTheme(isDark) {
+  document.body.classList.remove('light', 'dark');
+  document.body.classList.add(isDark ? 'dark' : 'light');
+  if (tg) {
+    try {
+      tg.setHeaderColor(isDark ? '#2C2C38' : '#D8DCFF');
+      tg.setBackgroundColor(isDark ? '#2C2C38' : '#ffffff');
+    } catch(e) {}
+  }
+}
+
+// Первичное определение темы:
+// 1) если открыто из Telegram → берём tg.colorScheme
+// 2) если открыто в обычном браузере → берём системное prefers-color-scheme
+const initialDark = tg
+  ? tg.colorScheme === 'dark'
+  : window.matchMedia('(prefers-color-scheme: dark)').matches;
+applyTheme(initialDark);
+
+if (tg) {
+  tg.ready();
+  tg.expand();
+  // Слушаем смену темы прямо во время сессии (например юзер переключил тему в Telegram)
+  tg.onEvent && tg.onEvent('themeChanged', () => {
+    applyTheme(tg.colorScheme === 'dark');
+  });
+}
+
+// В обычном браузере тоже слушаем системную смену темы
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', e => {
+      if (!tg) applyTheme(e.matches);
+    });
+}
+
+function openReportBot() {
+  // Deep-link ?start=from_widget — Telegram-клиент показывает кнопку START даже
+  // если юзер уже был в чате; при клике автоматически отправляет /start from_widget.
+  const url = `https://t.me/${DEBT_BOT_USERNAME}?start=from_widget`;
+
+  const opener = () => {
+    if (tg && tg.openTelegramLink) tg.openTelegramLink(url);
+    else window.open(url, '_blank');
+  };
+
+  // Сначала просим разрешение, чтобы бот мог сразу прислать приветствие
+  // (доступно с Mini App API 6.9). После ответа юзера в любом случае открываем чат.
+  if (tg && typeof tg.requestWriteAccess === 'function'
+      && typeof tg.isVersionAtLeast === 'function' && tg.isVersionAtLeast('6.9')) {
+    try {
+      tg.requestWriteAccess(() => opener());
+    } catch (_e) {
+      opener();
+    }
+  } else {
+    opener();
+  }
+}
+
+function openHelp() {
+  // Открывает чат с ботом и автоматически отправляет /start help —
+  // бот ловит этот deep-link и сразу показывает меню «Помочь».
+  const url = `https://t.me/${DEBT_BOT_USERNAME}?start=help`;
+  if (tg && tg.openTelegramLink) tg.openTelegramLink(url);
+  else window.open(url, '_blank');
+}
+
+// ─── PARSE NUMBER (учитывает ru-RU локаль Sheets: запятая = десятичный) ──────
+// parseMoney удалён — build.py возвращает числа как float
+
+// ─── FETCH ────────────────────────────────────────────────────────────────────
+// Данные приходят инлайн из <script id="data"> (заполняется build.py'ем при
+// сборке). Браузер потом фоном опрашивает /data.json (same-origin) для свежих
+// обновлений. Никаких походов в sheets.googleapis.com — ключ API больше не нужен.
+function readInlineData() {
+  try {
+    const el = document.getElementById('data');
+    if (!el || !el.textContent.trim()) return null;
+    const parsed = JSON.parse(el.textContent);
+    if (!parsed || !Array.isArray(parsed.debts)) return null;
+    return {
+      debts: parsed.debts,
+      payments: Array.isArray(parsed.payments) ? parsed.payments : [],
+      builtAt: parsed.built_at || null,
+    };
+  } catch(e) {
+    console.warn('inline-data parse failed:', e);
+    return null;
+  }
+}
+
+// normalizeType — больше не нужен, build.py нормализует тип на сервере
+
+async function fetchFreshData() {
+  try {
+    const res = await fetch('/data.json?_=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) return null;
+    const parsed = await res.json();
+    if (!parsed || !Array.isArray(parsed.debts)) return null;
+    return {
+      debts: parsed.debts,
+      payments: Array.isArray(parsed.payments) ? parsed.payments : [],
+      builtAt: parsed.built_at || null,
+    };
+  } catch(e) { return null; }
+}
+
+// ─── CALC ─────────────────────────────────────────────────────────────────────
+function calcCurrentDebt(d) {
+  if (d.rate === 0 || !d.startDate) return d.amount;
+  const start = new Date(d.startDate);
+  const days  = Math.max(0, (new Date() - start) / 86400000);
+  const accruedTotal    = d.amount * (d.rate / 100) * (days / 365);
+  const unpaidInterest  = Math.max(0, accruedTotal - (d.paidInterest || 0));
+  return d.amount + unpaidInterest;
+}
+function calcAccrued(d) { return calcCurrentDebt(d) - d.amount; }
+function fmt(n) { return new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(n); }
+function typeLabel(t) { return t === 'credit' ? 'кредит' : t === 'loan' ? 'займ' : 'долг'; }
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render(allDebts, payments) {
+  const debts        = allDebts.filter(d => d.status !== 'closed');
+  const closedDebts  = allDebts.filter(d => d.status === 'closed');
+
+  const total        = debts.reduce((s, d) => s + calcCurrentDebt(d), 0);
+  const totalAccrued = debts.reduce((s, d) => s + calcAccrued(d), 0);
+  const totalPaid    = payments.reduce((s, p) => s + p.amount, 0);
+  // % погашено от общей исторической суммы (текущий долг + уже выплачено)
+  const paidDenom = total + totalPaid;
+  const paidPct   = paidDenom > 0 ? Math.round((totalPaid / paidDenom) * 100) : 0;
+
+  const debtItems = debts.map(d => {
+    const cur     = calcCurrentDebt(d);
+    const accrued = calcAccrued(d);
+    return `
+      <div class="item-row">
+        <div class="item-marker ${d.type}"></div>
+        <div class="item-info">
+          <div class="item-name">${d.name}</div>
+          <div class="item-meta">
+            ${typeLabel(d.type)}
+          </div>
+        </div>
+        <div class="item-amount-col">
+          <div class="item-amount">${fmt(cur)} ₽</div>
+          ${accrued > 0 ? `<div class="item-accrued">+${fmt(accrued)} ₽</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  const closedItems = closedDebts.map(d => `
+    <div class="item-row closed">
+      <div class="item-marker closed"></div>
+      <div class="item-info">
+        <div class="item-name">${d.name}</div>
+        <div class="item-meta">${typeLabel(d.type)} · погашен</div>
+      </div>
+      <div class="item-amount-col">
+        <div class="item-amount green">${fmt(d.amount)} ₽</div>
+      </div>
+    </div>`).join('');
+
+  const paymentItems = payments.slice(0, 50).map(p => {
+    let dateStr = '';
+    if (p.date) {
+      try {
+        dateStr = new Date(p.date).toLocaleDateString('ru-RU', { day:'numeric', month:'short' }).toUpperCase();
+      } catch(e) {}
+    }
+    const subtype = p.type === 'полная' ? 'ЗАКРЫТИЕ' : (p.type ? 'ЧАСТИЧНАЯ' : '');
+    const meta = [dateStr, subtype, p.note ? escapeHtml(p.note).toUpperCase() : ''].filter(Boolean).join(' · ');
+    return `
+      <div class="item-row">
+        <div class="item-marker payment"></div>
+        <div class="item-info">
+          <div class="item-name">${p.creditor}</div>
+          <div class="item-meta">${meta}</div>
+        </div>
+        <div class="item-amount-col">
+          <div class="item-amount green">−${fmt(p.amount)} ₽</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  const emptyState = `
+    <div class="empty-state">
+      <div class="big">НОЛЬ <span class="accent-bg">ДОЛГОВ</span></div>
+      <div class="small">ЧИСТО</div>
+    </div>`;
+
+  document.getElementById('app').innerHTML = `
+
+    <div class="top-bar">
+      <div class="logo"><span class="dot"></span>НЕЗЕФИР · ДОЛГИ</div>
+      <div class="live">LIVE</div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-progress">
+        <svg class="hero-ring" viewBox="0 0 36 36">
+          <circle class="hero-ring-bg"   cx="18" cy="18" r="15.9155"></circle>
+          <circle class="hero-ring-fill" cx="18" cy="18" r="15.9155"
+                  stroke-dasharray="${paidPct}, 100"></circle>
+        </svg>
+        <div class="hero-progress-pct">${paidPct}%</div>
+        <div class="hero-progress-label">ПОГАШЕНО</div>
+      </div>
+      <div class="hero-content">
+        <div class="hero-label">ОБЩАЯ СУММА ДОЛГОВ</div>
+        <div class="hero-amount">${fmt(total)}<span class="currency">₽</span></div>
+        ${totalAccrued > 0 ? `<div class="hero-sub">ИЗ НИХ ПРОЦЕНТЫ <span class="num">${fmt(totalAccrued)} ₽</span></div>` : ''}
+      </div>
+    </div>
+
+    <div class="accent-bar"></div>
+
+    <div class="actions">
+      <button class="action primary" onclick="openReportBot()">
+        <span>СООБЩИТЬ О ДОЛГЕ</span>
+        <span class="arrow">→</span>
+      </button>
+      <button class="action" onclick="openHelp()">
+        <span>ПОМОЧЬ</span>
+        <span class="arrow">❤</span>
+      </button>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">АКТИВНЫХ</div>
+        <div class="stat-value accent">${debts.length}</div>
+        <div class="stat-meta">КРЕДИТОВ И ЗАЙМОВ</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">ВЫПЛАЧЕНО</div>
+        <div class="stat-value small">${fmt(totalPaid)} ₽</div>
+        <div class="stat-meta">${payments.length} ${payments.length === 1 ? 'ПЛАТЁЖ' : 'ПЛАТЕЖЕЙ'}</div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">ОТКРЫТЫЕ ДОЛГИ</div>
+      <div class="section-counter"><span class="pill">${debts.length}</span> АКТИВНЫХ</div>
+    </div>
+    <div class="section">
+      ${debts.length ? debtItems : emptyState}
+    </div>
+
+    ${closedDebts.length ? `
+      <div class="section-header">
+        <div class="section-title">ПОГАШЕНО</div>
+        <div class="section-counter">${closedDebts.length}</div>
+      </div>
+      <div class="section">${closedItems}</div>
+    ` : ''}
+
+    ${payments.length ? `
+      <div class="section-header">
+        <div class="section-title">ИСТОРИЯ ВЫПЛАТ</div>
+        <div class="section-counter">${payments.length}</div>
+      </div>
+      <div class="section">${paymentItems}</div>
+    ` : ''}
+
+    <div class="footer">
+      <div class="footer-mark">@NEZEFIR<span class="accent-bg">.</span></div>
+      <div class="footer-tag">16 ЛЕТ В ОБЩЕПИТЕ · LIVE COUNTER</div>
+    </div>
+  `;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderError() {
+  document.getElementById('app').innerHTML = `
+    <div class="top-bar">
+      <div class="logo"><span class="dot"></span>НЕЗЕФИР · ДОЛГИ</div>
+      <div class="live">OFFLINE</div>
+    </div>
+    <div class="error-state">
+      <div class="err-mark">ERROR 404</div>
+      <p>НЕ УДАЛОСЬ ЗАГРУЗИТЬ ДАННЫЕ<br>ПРОВЕРЬ НАСТРОЙКИ ТАБЛИЦЫ</p>
+    </div>`;
+}
+
+async function refresh() {
+  const data = await fetchFreshData();
+  if (data) render(data.debts, data.payments);
+}
+
+function init() {
+  // 1) Мгновенный рендер из inline-data, без сетевого запроса
+  const initial = readInlineData();
+  if (initial && initial.debts.length) {
+    render(initial.debts, initial.payments);
+  } else {
+    // Fallback: пустая страница до первого fetchFreshData (open в обычном браузере
+    // через file://, либо устаревший билд без inline-data)
+    refresh().catch(() => renderError());
+  }
+
+  // 2) Тихие фоновые обновления каждые 60 сек
+  setInterval(() => { refresh().catch(() => {}); }, 60 * 1000);
+}
+
+init();
+</script>
+</body>
+</html>
