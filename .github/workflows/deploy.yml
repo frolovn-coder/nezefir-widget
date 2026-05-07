@@ -36,9 +36,17 @@ jobs:
           GOOGLE_SA_JSON: ${{ secrets.GOOGLE_SA_JSON }}
         run: python3 scripts/build.py
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=nezefir-widget --branch=main
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Trust target host
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H 45.8.98.228 >> ~/.ssh/known_hosts
+
+      - name: Deploy to lintu-coffee.ru server (Caddy static)
+        run: |
+          rsync -az --delete --omit-dir-times --no-perms \
+            dist/ deploy@45.8.98.228:/var/www/lintu-debts/
