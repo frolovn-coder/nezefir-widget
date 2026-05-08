@@ -17,6 +17,12 @@ on:
   repository_dispatch:
     types: [sheet-changed]
 
+# Серия правок подряд (бот добавил долг → выплату → закрытие) не должна плодить
+# параллельные билды. Новый run отменяет предыдущий пока тот не закончил.
+concurrency:
+  group: deploy-widget
+  cancel-in-progress: true
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
