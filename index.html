@@ -698,6 +698,14 @@ function render(allDebts, payments) {
   const total        = debts.reduce((s, d) => s + calcCurrentDebt(d), 0);
   const totalAccrued = debts.reduce((s, d) => s + calcAccrued(d), 0);
   const totalPaid    = payments.reduce((s, p) => s + p.amount, 0);
+
+  // Сумма всех выплат по нику. Платежи в data.json привязаны к нику (creditor),
+  // а не к строке долга; для закрытого долга это и есть полная погашенная сумма.
+  // (В колонке D закрытого долга лежит лишь остаток перед последним платежом.)
+  const paidByNick = {};
+  for (const p of payments) {
+    paidByNick[p.creditor] = (paidByNick[p.creditor] || 0) + p.amount;
+  }
   // % погашено от общей исторической суммы (текущий долг + уже выплачено)
   const paidDenom = total + totalPaid;
   const paidPct   = paidDenom > 0 ? Math.round((totalPaid / paidDenom) * 100) : 0;
@@ -721,7 +729,11 @@ function render(allDebts, payments) {
       </div>`;
   }).join('');
 
-  const closedItems = closedDebts.map(d => `
+  const closedItems = closedDebts.map(d => {
+    // Полная погашенная сумма = сумма всех выплат по нику. Fallback на тело (d.amount),
+    // если выплат почему-то нет (напр. долг закрыли списанием без платежей).
+    const paidTotal = paidByNick[d.name] || d.amount;
+    return `
     <div class="item-row closed">
       <div class="item-marker closed"></div>
       <div class="item-info">
@@ -729,9 +741,10 @@ function render(allDebts, payments) {
         <div class="item-meta">${typeLabel(d.type)} · погашен</div>
       </div>
       <div class="item-amount-col">
-        <div class="item-amount green">${fmt(d.amount)} ₽</div>
+        <div class="item-amount green">${fmt(paidTotal)} ₽</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   const paymentItems = payments.slice(0, 50).map(p => {
     let dateStr = '';
