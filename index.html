@@ -137,6 +137,10 @@
     animation: blink 2s ease-in-out infinite;
   }
   @keyframes blink { 50% { opacity: 0.3; } }
+  /* Данные протухли: сборка виджета могла остановиться, а страница
+     продолжала бы показывать старые цифры как живые. */
+  .top-bar .live.stale { color: var(--coral); }
+  .top-bar .live.stale::before { animation: none; }
 
   /* ─── HERO — главный блок с суммой долгов ────────────────────────── */
   .hero {
@@ -691,7 +695,20 @@ function fmt(n) { return new Intl.NumberFormat('ru-RU', { maximumFractionDigits:
 function typeLabel(t) { return t === 'credit' ? 'кредит' : t === 'loan' ? 'займ' : 'долг'; }
 
 // ─── RENDER ───────────────────────────────────────────────────────────────────
-function render(allDebts, payments) {
+function render(allDebts, payments, builtAt) {
+  // Проценты считаются в браузере от ТЕКУЩЕГО времени, поэтому даже
+  // двухмесячные данные выглядят живыми — сумма плавно растёт. Именно это
+  // скрывало прошлый двухмесячный простой сборки. Показываем правду.
+  let stale = false, builtLabel = '';
+  if (builtAt) {
+    const iso = /[Zz]|[+-]\d{2}:?\d{2}$/.test(builtAt) ? builtAt : builtAt + 'Z';
+    const b = new Date(iso);
+    if (!isNaN(b.getTime())) {
+      stale = (Date.now() - b.getTime()) / 36e5 > 6;
+      builtLabel = b.toLocaleString('ru-RU', { day: 'numeric', month: 'short',
+                                               hour: '2-digit', minute: '2-digit' });
+    }
+  }
   const debts        = allDebts.filter(d => d.status !== 'closed');
   const closedDebts  = allDebts.filter(d => d.status === 'closed');
 
@@ -778,7 +795,7 @@ function render(allDebts, payments) {
 
     <div class="top-bar">
       <div class="logo"><span class="dot"></span>НЕЗЕФИР · ДОЛГИ</div>
-      <div class="live">LIVE</div>
+      <div class="live${stale ? ' stale' : ''}">${stale ? 'ДАННЫЕ ОТ ' + builtLabel : 'LIVE'}</div>
     </div>
 
     <div class="hero">
@@ -873,14 +890,14 @@ function renderError() {
 
 async function refresh() {
   const data = await fetchFreshData();
-  if (data) render(data.debts, data.payments);
+  if (data) render(data.debts, data.payments, data.builtAt);
 }
 
 function init() {
   // 1) Мгновенный рендер из inline-data, без сетевого запроса
   const initial = readInlineData();
   if (initial && initial.debts.length) {
-    render(initial.debts, initial.payments);
+    render(initial.debts, initial.payments, initial.builtAt);
   } else {
     // Fallback: пустая страница до первого fetchFreshData (open в обычном браузере
     // через file://, либо устаревший билд без inline-data)

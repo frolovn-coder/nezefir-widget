@@ -20,7 +20,7 @@ import os
 import re
 import shutil
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import gspread
@@ -98,7 +98,10 @@ def fetch_debts(sh) -> list[dict]:
             'rate':         safe_float(r[4]),                           # E
             'startDate':    str(r[5]) if r[5] else '',                  # F
             'endDate':      str(r[6]) if r[6] else '',                  # G
-            'note':         str(r[7]) if r[7] else '',                  # H
+            # H (заметка «за что долг») НЕ выгружаем: это свободный текст
+            # кредитора — зарплаты, номера договоров, условия. Виджет его не
+            # показывает, а в data.json он был доступен любому по прямой ссылке
+            # и обесценивал анонимизацию никами.
             'status':       (str(r[8]) if r[8] else 'active').lower().strip(),  # I
             'paidInterest': safe_float(r[9]),                            # J
             # K-N (user_id, username, link_code, link_url) — НЕ выводим, приватка
@@ -144,7 +147,9 @@ def main() -> int:
     data = {
         'debts': debts,
         'payments': payments,
-        'built_at': datetime.now().isoformat(timespec='seconds'),
+        # С таймзоной: CI работает в UTC, а браузер парсит ISO без суффикса
+        # как ЛОКАЛЬНОЕ время — из-за этого возраст сборки уезжал на 3 часа.
+        'built_at': datetime.now(timezone.utc).isoformat(timespec='seconds'),
     }
 
     if not debts:
