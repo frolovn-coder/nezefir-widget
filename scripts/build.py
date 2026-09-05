@@ -78,15 +78,15 @@ def normalize_type(t: str) -> str:
 
 
 def fetch_debts(sh) -> list[dict]:
-    """Долги!A2:N — но в JSON выводим ТОЛЬКО публичные поля.
+    """Долги!A2:P — но в JSON выводим ТОЛЬКО публичные поля.
     Дропаем колонку A (реальное имя) и K-N (user_id, username, токены).
     """
     ws = sh.worksheet('Долги')
-    rows = ws.get('A2:N', value_render_option='UNFORMATTED_VALUE')
+    rows = ws.get('A2:P', value_render_option='UNFORMATTED_VALUE')
     out = []
     for r in rows:
         # Пад до 14 колонок
-        r = (list(r) + [''] * 14)[:14]
+        r = (list(r) + [''] * 16)[:16]
         nick = (str(r[1]) if r[1] is not None else '').strip()
         # Дропаем строки без ника — там либо мусор, либо приватные данные
         if not nick:
@@ -104,6 +104,10 @@ def fetch_debts(sh) -> list[dict]:
             # и обесценивал анонимизацию никами.
             'status':       (str(r[8]) if r[8] else 'active').lower().strip(),  # I
             'paidInterest': safe_float(r[9]),                            # J
+            # O/P — модель начисления процентов. Пока O пустая, фронт считает
+            # по старой схеме (см. calcCurrentDebt). Внимание: N занята LinkURL.
+            'lastAccrual':  str(r[14]).strip() if r[14] else '',          # O
+            'carriedInterest': safe_float(r[15]),                         # P
             # K-N (user_id, username, link_code, link_url) — НЕ выводим, приватка
         })
     return out

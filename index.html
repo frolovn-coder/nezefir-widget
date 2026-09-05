@@ -683,11 +683,27 @@ async function fetchFreshData() {
 
 // ─── CALC ─────────────────────────────────────────────────────────────────────
 function calcCurrentDebt(d) {
-  if (d.rate === 0 || !d.startDate) return d.amount;
+  if (!d.rate) return d.amount;
+  const now = new Date();
+  // НОВАЯ модель: проценты капают на текущее тело со дня последнего расчёта
+  // (колонка O) и складываются с перенесённым остатком (колонка P).
+  if (d.lastAccrual) {
+    const base = new Date(d.lastAccrual);
+    if (!isNaN(base.getTime())) {
+      const days = Math.max(0, Math.floor((now - base) / 86400000));
+      return d.amount + Math.max(0, (d.carriedInterest || 0)
+                                    + d.amount * (d.rate / 100) * (days / 365));
+    }
+  }
+  // Старая модель для строк, где O ещё пустая. Она верна, пока тело долга не
+  // уменьшалось; после частичной выплаты, срезающей тело, начисление
+  // «замерзало» — ради этого и вводились O/P.
+  if (!d.startDate) return d.amount;
   const start = new Date(d.startDate);
-  const days  = Math.max(0, (new Date() - start) / 86400000);
-  const accruedTotal    = d.amount * (d.rate / 100) * (days / 365);
-  const unpaidInterest  = Math.max(0, accruedTotal - (d.paidInterest || 0));
+  if (isNaN(start.getTime())) return d.amount;
+  const days = Math.max(0, Math.floor((now - start) / 86400000));
+  const accruedTotal   = d.amount * (d.rate / 100) * (days / 365);
+  const unpaidInterest = Math.max(0, accruedTotal - (d.paidInterest || 0));
   return d.amount + unpaidInterest;
 }
 function calcAccrued(d) { return calcCurrentDebt(d) - d.amount; }
