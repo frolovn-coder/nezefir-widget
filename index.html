@@ -434,6 +434,9 @@
     color: var(--coral);
   }
 
+  /* сколько отложено на долг — из Пульта владельца */
+  .item-reserved { color: var(--green); }
+
   .item-row.closed { opacity: 0.55; }
   .item-row.closed .item-name { text-decoration: line-through; }
 
@@ -752,7 +755,7 @@ function render(allDebts, payments, builtAt) {
         <div class="item-info">
           <div class="item-name">${d.name}</div>
           <div class="item-meta">
-            ${typeLabel(d.type)}
+            ${typeLabel(d.type)}${d.reserved > 0 ? ` · <span class="item-reserved">отложено ${fmt(d.reserved)} ₽</span>` : ''}
           </div>
         </div>
         <div class="item-amount-col">

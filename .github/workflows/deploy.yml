@@ -40,6 +40,8 @@ jobs:
       - name: Build dist/ from Google Sheets
         env:
           GOOGLE_SA_JSON: ${{ secrets.GOOGLE_SA_JSON }}
+          # «отложено на долги» из Пульта (ссылка только на эти суммы); нет секрета — собираем без отметок
+          PULT_RESERVES_URL: ${{ secrets.PULT_RESERVES_URL }}
         run: python3 scripts/build.py
 
       - name: Setup SSH agent

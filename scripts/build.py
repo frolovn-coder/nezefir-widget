@@ -20,6 +20,7 @@ import os
 import re
 import shutil
 import sys
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -139,6 +140,35 @@ def fetch_payments(sh) -> list[dict]:
     return out
 
 
+def _nick(name) -> str:
+    """Ник для сравнения: без регистра, «ё» = «е», лишние пробелы убраны."""
+    return ' '.join(str(name or '').lower().replace('ё', 'е').split())
+
+
+def fetch_reserves() -> dict[str, float]:
+    """Сколько отложено на каждый долг — из «Пульта» (личное приложение владельца; ник → сумма).
+
+    Ссылка — секрет PULT_RESERVES_URL (по ней видно только эти суммы). Нет ссылки или Пульт не ответил —
+    собираем без отметок «отложено», виджет от этого не ломается. Саму ссылку в журнал не печатаем.
+    """
+    url = os.environ.get('PULT_RESERVES_URL', '').strip()
+    if not url:
+        return {}
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'nezefir-widget'})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.load(r)
+    except Exception as e:  # noqa: BLE001 — любая беда с Пультом не должна валить сборку
+        print(f'ВНИМАНИЕ: отложенное из Пульта не получено ({type(e).__name__}) — собираем без него', file=sys.stderr)
+        return {}
+    out: dict[str, float] = {}
+    for x in (data.get('reserves') or []) if isinstance(data, dict) else []:
+        name, v = _nick(x.get('name')), x.get('reserved')
+        if name and isinstance(v, (int, float)) and v > 0:
+            out[name] = out.get(name, 0.0) + float(v)
+    return out
+
+
 def main() -> int:
     print('Авторизация в Google Sheets…')
     creds = get_credentials()
@@ -147,6 +177,17 @@ def main() -> int:
     print('Тянем Долги и Выплаты…')
     debts = fetch_debts(sh)
     payments = fetch_payments(sh)
+
+    # «отложено» у открытых долгов — из Пульта, по нику (владелец 02.11.2026)
+    reserves = fetch_reserves()
+    matched = 0
+    for d in debts:
+        r = reserves.get(_nick(d['name']))
+        if r and d['status'] != 'closed':
+            d['reserved'] = round(r, 2)
+            matched += 1
+    if reserves:
+        print(f'  отложено из Пульта: {matched} долгов из {len(reserves)} отметок')
 
     data = {
         'debts': debts,
