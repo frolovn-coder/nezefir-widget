@@ -679,7 +679,7 @@ function renderSupport() {
     + `<div class="m sub" style="font-size:13px">→</div></button>`;
   return screen(`
     ${backLink()}
-    ${header('N-04 · ПОДДЕРЖКА · 5 СПОСОБОВ', 'Поддержать')}
+    ${header('N-04 · ПОДДЕРЖКА · 6 СПОСОБОВ', 'Поддержать')}
     <div class="hot" style="padding:16px;display:flex;flex-direction:column;gap:12px">
       <div class="lbl"><span>01 · РЕКЛАМА В НЕЗЕФИРЕ</span></div>
       <div style="display:flex;align-items:center;gap:12px">
@@ -692,7 +692,8 @@ function renderSupport() {
       ${row('02', 'consult', I.chat, false, 'Консультация', 'ЛИЧНО С НИКОЛАЕМ · 15&nbsp;000&nbsp;₽')}
       ${row('03', 'donate', I.star, false, 'Донат', 'ЗВЁЗДЫ ИЛИ РУБЛИ · РАЗОВО ИЛИ КАЖДЫЙ МЕСЯЦ')}
       ${row('04', 'lintu', I.cup, true, 'Кофе в Lintu', 'ЛУЧШАЯ ПОДДЕРЖКА · ВЫПИТЬ КОФЕ У НАС')}
-      ${row('05', 'invite', I.gift, true, 'Пригласи друга и выигрывай призы', 'РОЗЫГРЫШ КАЖДЫЙ МЕСЯЦ · ОТ LINTU')}
+      ${row('05', 'pult', I.pult, false, 'Скачать Пульт', 'БЮДЖЕТ НА ДЕНЬ · ДЕЛА · КАЛЕНДАРЬ')}
+      ${row('06', 'invite', I.gift, true, 'Пригласи друга и выигрывай призы', 'РОЗЫГРЫШ КАЖДЫЙ МЕСЯЦ · ОТ LINTU')}
     </div>`);
 }
 
@@ -804,28 +805,24 @@ function renderLintu() {
 }
 
 // ─── ЭКРАН: ПУЛЬТ ─────────────────────────────────────────────────────────────
-function renderPult(m) {
-  const reserved = m ? m.reservedTotal : 0;
+function renderPult() {
+  // 13.11.2026 владелец: Пульт — реклама функций, без отсылок к долгам.
   const feat = (icon, t, sub) =>
     `<div class="frow"><div class="ico s">${ic(icon, 19, 1.7)}</div><div style="display:flex;flex-direction:column;gap:3px;min-width:0"><div style="font-size:15px;font-weight:500">${t}</div><div class="sub">${sub}</div></div></div>`;
   return screen(`
     ${backLink()}
-    ${header('N-02 · ПУЛЬТ', 'Пульт')}
-    ${reserved > 0 ? `
-    <div class="hot" style="padding:16px;display:flex;flex-direction:column;gap:10px">
-      <div class="lbl sb"><span>ЭТИМ Я ГАШУ ДОЛГИ</span><span class="or">ИЗ МОЕГО ПУЛЬТА</span></div>
-      <div class="big"><div class="nw" style="font-size:42px;font-weight:600;letter-spacing:-.03em;line-height:1">${fmt(reserved)}</div><div class="m lbl cur">₽</div></div>
-      <div class="hi" style="font-size:14px;line-height:1.4">отложено на следующие выплаты — эта сумма приходит на счётчик прямо из Пульта</div>
-    </div>` : ''}
-    <div class="pnl" style="padding:14px 16px;display:flex;flex-direction:column;gap:6px">
-      <div style="font-size:19px;font-weight:600">У тебя тоже есть долги?</div>
-      <div class="soft" style="font-size:14px;line-height:1.4">Пульт покажет, сколько можно тратить сегодня, и посчитает, когда закроешь всё.</div>
+    ${header('N-02 · ПУЛЬТ · ДЕНЬГИ И ДЕЛА', 'Пульт')}
+    <div class="hot" style="padding:16px;display:flex;flex-direction:column;gap:8px">
+      <div class="lbl sb"><span>БЮДЖЕТ НА СЕГОДНЯ</span><span class="or">БЕСПЛАТНО</span></div>
+      <div style="font-size:21px;font-weight:600;line-height:1.25">Всегда знаешь, сколько можно потратить сегодня</div>
+      <div class="soft" style="font-size:14px;line-height:1.45">Пульт сам считает дневной бюджет из доходов, счетов и плановых платежей — и держит рядом дела и календарь.</div>
     </div>
     <div class="pnl" style="padding:2px 14px">
       ${feat(I.cal, 'Бюджет на день', 'СКОЛЬКО МОЖНО ПОТРАТИТЬ СЕГОДНЯ')}
-      ${feat(I.chart, 'Долги и кредиты', 'КОМУ, СКОЛЬКО И КОГДА ЗАКРОЕШЬ')}
+      ${feat(I.chart, 'План на месяц', 'РАСПРЕДЕЛЕНИЕ ДОХОДА · ПЛАТЕЖИ · ОСТАТОК')}
       ${feat(I.target, 'Цели и подушка', 'КОПИШЬ — ВИДИШЬ, КОГДА ХВАТИТ')}
-      ${feat(I.check, 'Дела и календарь', 'РЯДОМ С ДЕНЬГАМИ, В ОДНОМ МЕСТЕ')}
+      ${feat(I.check, 'Дела и календарь', 'РАБОТА · ЛИЧНОЕ · СЕМЬЯ · ВАЖНОСТЬ ЦВЕТОМ')}
+      ${feat(I.phone, 'Виджеты и оформления', 'БЮДЖЕТ НА ЭКРАНЕ ТЕЛЕФОНА · 5 СТИЛЕЙ')}
     </div>
     <button type="button" class="btn" data-act="pultGet">${ic(I.phone, 19, 2)}Скачать бесплатно</button>
     <button type="button" class="btn2" data-act="pultShare">${ic(I.send, 18, 1.8)}Посоветовать друзьям</button>
