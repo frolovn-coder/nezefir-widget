@@ -44,6 +44,13 @@ jobs:
           PULT_RESERVES_URL: ${{ secrets.PULT_RESERVES_URL }}
         run: python3 scripts/build.py
 
+      # Картинка и подпись для закрепа канала: бот берёт dist/card.png и dist/card.json
+      # с сервера. Сбой здесь не мешает выкладке мини-приложения.
+      - name: Render pinned card
+        continue-on-error: true
+        timeout-minutes: 2
+        run: python3 scripts/card.py
+
       - name: Setup SSH agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
