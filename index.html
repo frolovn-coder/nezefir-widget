@@ -679,9 +679,9 @@ function renderSupport() {
     + `<div class="m sub" style="font-size:13px">→</div></button>`;
   return screen(`
     ${backLink()}
-    ${header('N-04 · ПОДДЕРЖКА · 6 СПОСОБОВ', 'Поддержать')}
+    ${header('N-04 · ПОДДЕРЖКА · 5 СПОСОБОВ', 'Поддержать')}
     <div class="hot" style="padding:16px;display:flex;flex-direction:column;gap:12px">
-      <div class="lbl sb"><span>01 · РЕКЛАМА В НЕЗЕФИРЕ</span><span class="or">ДЛЯ БИЗНЕСА</span></div>
+      <div class="lbl"><span>01 · РЕКЛАМА В НЕЗЕФИРЕ</span></div>
       <div style="display:flex;align-items:center;gap:12px">
         <div class="ico" style="width:48px;height:48px;border-radius:14px">${ic(I.horn, 24, 1.7, ' style="filter:drop-shadow(0 0 6px rgba(61,123,255,.8))"')}</div>
         <div style="display:flex;flex-direction:column;gap:3px;min-width:0"><div style="font-size:18px;font-weight:600">Купить рекламу</div><div class="soft" style="font-size:13.5px;line-height:1.35">Пост, закреп или обзор. Текст и файлы — боту в чате.</div></div>
@@ -692,10 +692,8 @@ function renderSupport() {
       ${row('02', 'consult', I.chat, false, 'Консультация', 'ЛИЧНО С НИКОЛАЕМ · 15&nbsp;000&nbsp;₽')}
       ${row('03', 'donate', I.star, false, 'Донат', 'ЗВЁЗДЫ ИЛИ РУБЛИ · РАЗОВО ИЛИ КАЖДЫЙ МЕСЯЦ')}
       ${row('04', 'lintu', I.cup, true, 'Кофе в Lintu', 'ЛУЧШАЯ ПОДДЕРЖКА · ВЫПИТЬ КОФЕ У НАС')}
-      ${row('05', 'pult', I.pult, false, 'Скачать Пульт', 'ДЕНЬГИ И ДЕЛА · ПОСОВЕТУЙ ДРУЗЬЯМ')}
-      ${row('06', 'invite', I.gift, true, 'Пригласи друга и выигрывай призы', 'РОЗЫГРЫШ КАЖДЫЙ МЕСЯЦ · ОТ LINTU')}
-    </div>
-    <button type="button" class="link" data-act="write">НАПИСАТЬ НИКОЛАЮ →</button>`);
+      ${row('05', 'invite', I.gift, true, 'Пригласи друга и выигрывай призы', 'РОЗЫГРЫШ КАЖДЫЙ МЕСЯЦ · ОТ LINTU')}
+    </div>`);
 }
 
 // ─── ЭКРАН: РЕКЛАМА ───────────────────────────────────────────────────────────
@@ -912,7 +910,6 @@ const ACTIONS = {
   back:   () => back(),
   home:   () => { S.stack = ['debts']; paint(false); },
   report: () => openReportBot(),
-  write:  () => openTg(`${BOT}?start=write`),
   tab:    (arg) => {
     if (S.tab === arg) return;
     tick(); S.tab = arg;
