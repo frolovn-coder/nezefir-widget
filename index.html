@@ -874,8 +874,7 @@ function renderShare(m) {
           <div style="position:absolute;left:${p}%;top:-3px;width:1px;height:21px;background:#FF6A3D"></div>
         </div>
         <div class="k" style="font-size:10px;letter-spacing:0;line-height:1.5">ВЫПЛАЧЕНО <span class="w nw">${money(m.totalPaid)}</span> · ЗАКРЫТО <span class="w nw">${m.closedRows.length} ИЗ ${m.allCount}</span></div>
-        <div style="font-size:13.5px;line-height:1.35;color:#8FB2FF">Основатель кофеен Lintu честно показывает, кому и сколько должен.</div>
-      </div>` : `<div class="scard"><div class="k">НЕЗЕФИР · ОТКРЫТЫЙ СЧЁТЧИК ДОЛГОВ</div><div style="font-size:13.5px;line-height:1.35;color:#8FB2FF">Основатель кофеен Lintu честно показывает, кому и сколько должен.</div></div>`;
+      </div>` : `<div class="scard"><div class="k">НЕЗЕФИР · ОТКРЫТЫЙ СЧЁТЧИК ДОЛГОВ</div><div style="font-size:13.5px;line-height:1.35;color:#8FB2FF">Кому, сколько и что уже выплачено.</div></div>`;
   const story = canStory()
     ? `<button type="button" class="btn2" data-act="shareStory">${ic(I.story, 18, 1.8)}В сторис</button>` : '';
   return screen(`
@@ -904,7 +903,7 @@ const SCREENS = {
 };
 
 // ─── ДЕЙСТВИЯ ─────────────────────────────────────────────────────────────────
-const SHARE_TEXT = 'Открытый счётчик долгов основателя кофеен Lintu — кому и сколько он должен';
+const SHARE_TEXT = 'НЕЗЕФИР — открытый счётчик долгов: кому, сколько и что уже выплачено';
 const PULT_TEXT  = 'Пульт — деньги и дела в одном приложении. Показывает, сколько можно тратить сегодня';
 
 const ACTIONS = {
