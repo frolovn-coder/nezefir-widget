@@ -220,10 +220,13 @@
   .frow:last-child { border-bottom: none; }
 
   /* ─── ПРИГЛАСИ ДРУГА ────────────────────────────────────────────────── */
-  .pz { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
-  .pz:last-child { border-bottom: none; }
-  .pz i { font-style: normal; width: 30px; height: 30px; border-radius: 9px; background: var(--orA); color: var(--or);
-          display: flex; align-items: center; justify-content: center; flex: none; }
+  .prz-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 8px 0 12px; }
+  .prz { box-sizing: border-box; min-height: 132px; padding: 12px; border-radius: 16px; border: 1px solid var(--line2);
+         background: var(--pnl); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .prz-i { width: 46px; height: 46px; border-radius: 13px; background: var(--orA); color: var(--or);
+             display: flex; align-items: center; justify-content: center; flex: none; }
+  .prz-t { font-size: 16px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+  .prz-t.none { font-size: 14.5px; font-weight: 500; color: var(--soft); }
   .rk { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
   .rk:last-child { border-bottom: none; }
 
@@ -258,6 +261,8 @@
 const DEBT_BOT_USERNAME = 'nezefir_debt_bot';
 const BOT = `https://t.me/${DEBT_BOT_USERNAME}`;
 const MINIAPP_URL = `https://t.me/${DEBT_BOT_USERNAME}/debts`;
+// Призы розыгрыша «Пригласи друга»: всегда 4. Пустая строка — «Приз ещё не выбран».
+const RAFFLE_PRIZES = ['', '', '', ''];
 const LINTU_IOS     = 'https://apps.apple.com/ru/app/lintu/id6738983857';
 const LINTU_ANDROID = 'https://play.google.com/store/apps/details?id=com.linty.app';
 const LINTU_SITE    = 'https://lintu-coffee.ru';
@@ -693,7 +698,7 @@ function renderSupport() {
       ${row('03', 'donate', I.star, false, 'Донат', 'ЗВЁЗДЫ ИЛИ РУБЛИ · РАЗОВО ИЛИ КАЖДЫЙ МЕСЯЦ')}
       ${row('04', 'lintu', I.cup, true, 'Кофе в Lintu', 'ЛУЧШАЯ ПОДДЕРЖКА · ВЫПИТЬ КОФЕ У НАС')}
       ${row('05', 'pult', I.pult, false, 'Скачать Пульт', 'БЮДЖЕТ НА ДЕНЬ · ДЕЛА · КАЛЕНДАРЬ')}
-      ${row('06', 'invite', I.gift, true, 'Пригласи друга и выигрывай призы', 'РОЗЫГРЫШ КАЖДЫЙ МЕСЯЦ · ОТ LINTU')}
+      ${row('06', 'invite', I.gift, true, 'Пригласи друга и выигрывай призы', '4 ПРИЗА КАЖДЫЙ МЕСЯЦ · ОТ НЕЗЕФИРА')}
     </div>`);
 }
 
@@ -843,11 +848,10 @@ function renderInvite() {
     ${header('N-07 · ПРИГЛАСИ ДРУГА · РОЗЫГРЫШ', 'Пригласи друга и выигрывай призы', 'font-size:28px;line-height:1.1')}
     <div class="soft" style="font-size:14px;line-height:1.4;padding:0 2px">Друг подписался на НЕЗЕФИР по твоей ссылке — и ты участвуешь в розыгрыше месяца.</div>
     <button type="button" class="btn" data-act="invite">${ic(I.send, 18, 2)}Получить мою ссылку</button>
-    <div class="hot" style="padding:14px 16px 6px;display:flex;flex-direction:column">
-      <div class="lbl sb" style="padding-bottom:4px"><span>РОЗЫГРЫШ КАЖДЫЙ МЕСЯЦ</span><span class="or">ПРИЗЫ ОТ LINTU</span></div>
-      <div class="pz"><i>🩴</i><span>Тапочки Lintu</span></div>
-      <div class="pz"><i>☕</i><span>Кофе Lintu</span></div>
-      <div class="pz"><i>🥤</i><span>Бесплатные напитки</span></div>
+    <div class="hot" style="padding:14px 16px 4px;display:flex;flex-direction:column">
+      <div class="lbl sb"><span>РОЗЫГРЫШ МЕСЯЦА · 4 ПРИЗА</span><span class="or">ОТ НЕЗЕФИРА</span></div>
+      <div class="prz-grid">${RAFFLE_PRIZES.map((t, i) => `<div class="prz"><div class="lbl">ПРИЗ ${pad2(i + 1)}</div><div class="prz-i">${ic(I.gift, 22, 1.7)}</div><div class="prz-t${t ? '' : ' none'}">${t ? escapeHtml(t) : 'Приз ещё не выбран'}</div></div>`).join('')}</div>
+      <div class="soft" style="font-size:13.5px;line-height:1.4;padding-bottom:10px">4 победителя выбираются случайно из участников розыгрыша.</div>
     </div>
     <div class="soft" style="font-size:13px;line-height:1.45;padding:0 2px">В розыгрыше: топ-10 тех, кто привёл больше всех подписчиков, и все, кто привёл хотя бы одного за последние 30 дней. Считаются только друзья, которые остались подписаны.</div>
     ${topHtml}`);
