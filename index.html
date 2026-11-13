@@ -223,6 +223,9 @@
   .rule { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.4; }
   .rule b { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--blue); color: var(--hi);
             font: 500 11px 'JetBrains Mono', monospace; display: flex; align-items: center; justify-content: center; }
+  .thumbs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .thumbs > * { width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; object-fit: cover; display: flex;
+                align-items: center; justify-content: center; background: var(--orA); color: var(--or); box-sizing: border-box; border: 1px solid var(--line); }
   .prz-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 8px 0 12px; }
   .prz { box-sizing: border-box; min-height: 132px; padding: 12px; border-radius: 16px; border: 1px solid var(--line2);
          background: var(--pnl); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -673,8 +676,8 @@ function renderDebts(m) {
       </div>
       ${card}
       <div class="duo">
-        <button type="button" class="btn" data-act="report">${ic(I.plus, 18, 2.2)}Записать долг</button>
-        <button type="button" class="btn2" data-go="support">${ic(I.heart, 18, 1.8, ' class="or"')}Поддержать</button>
+        <button type="button" class="btn2" data-act="report">${ic(I.plus, 18, 2.2)}Записать долг</button>
+        <button type="button" class="btn" data-go="support">${ic(I.heart, 18, 2)}Поддержать</button>
       </div>
       ${lists}
     </div></section>
@@ -695,19 +698,17 @@ function renderSupport() {
     ${backLink()}
     ${header('N-04 · ПОДДЕРЖКА · 6 СПОСОБОВ', 'Поддержать')}
     <div class="hot" style="padding:16px;display:flex;flex-direction:column;gap:12px">
-      <div class="lbl"><span>01 · РЕКЛАМА В НЕЗЕФИРЕ</span></div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="ico" style="width:48px;height:48px;border-radius:14px">${ic(I.horn, 24, 1.7, ' style="filter:drop-shadow(0 0 6px rgba(61,123,255,.8))"')}</div>
-        <div style="display:flex;flex-direction:column;gap:3px;min-width:0"><div style="font-size:18px;font-weight:600">Купить рекламу</div><div class="soft" style="font-size:13.5px;line-height:1.35">Пост, закреп или обзор. Текст и файлы — боту в чате.</div></div>
-      </div>
-      <button type="button" class="btn" data-go="ads">Оставить заявку</button>
+      <div class="lbl sb"><span>01 · РОЗЫГРЫШ МЕСЯЦА</span><span class="or">ОТ НЕЗЕФИРА</span></div>
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:19px;font-weight:600;line-height:1.25">Пригласи друга и выигрывай призы</div><div class="soft" style="font-size:13.5px;line-height:1.35">Друг подписался по твоей ссылке — и ты в розыгрыше. 4 приза каждый месяц.</div></div>
+      <div class="thumbs">${RAFFLE_PRIZES.map(p => p.img ? `<img src="${p.img}" alt="">` : `<div>${ic(I.gift, 20, 1.7)}</div>`).join('')}</div>
+      <button type="button" class="btn" data-go="invite">Участвовать</button>
     </div>
     <div class="pnl" style="padding:2px 14px">
-      ${row('02', 'consult', I.chat, false, 'Консультация', 'ЛИЧНО С НИКОЛАЕМ · 15&nbsp;000&nbsp;₽')}
-      ${row('03', 'donate', I.star, false, 'Донат', 'ЗВЁЗДЫ ИЛИ РУБЛИ · РАЗОВО ИЛИ КАЖДЫЙ МЕСЯЦ')}
-      ${row('04', 'lintu', I.cup, true, 'Кофе в Lintu', 'ЛУЧШАЯ ПОДДЕРЖКА · ВЫПИТЬ КОФЕ У НАС')}
-      ${row('05', 'pult', I.pult, false, 'Скачать Пульт', 'БЮДЖЕТ НА ДЕНЬ · ДЕЛА · КАЛЕНДАРЬ')}
-      ${row('06', 'invite', I.gift, true, 'Пригласи друга и выигрывай призы', '4 ПРИЗА КАЖДЫЙ МЕСЯЦ · ОТ НЕЗЕФИРА')}
+      ${row('02', 'ads', I.horn, false, 'Купить рекламу', 'ПОСТ · ЗАКРЕП · ОБЗОР С ВЫЕЗДОМ')}
+      ${row('03', 'consult', I.chat, false, 'Консультация', 'ЛИЧНО С НИКОЛАЕМ · 15&nbsp;000&nbsp;₽')}
+      ${row('04', 'donate', I.star, false, 'Донат', 'ЗВЁЗДЫ ИЛИ РУБЛИ · РАЗОВО ИЛИ КАЖДЫЙ МЕСЯЦ')}
+      ${row('05', 'lintu', I.cup, true, 'Кофе в Lintu', 'ЛУЧШАЯ ПОДДЕРЖКА · ВЫПИТЬ КОФЕ У НАС')}
+      ${row('06', 'pult', I.pult, false, 'Скачать Пульт', 'БЮДЖЕТ НА ДЕНЬ · ДЕЛА · КАЛЕНДАРЬ')}
     </div>`);
 }
 
