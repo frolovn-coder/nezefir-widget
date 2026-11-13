@@ -230,6 +230,10 @@ def main() -> int:
     DST_DIR.mkdir(parents=True, exist_ok=True)
     DST_HTML.write_text(new_html, encoding='utf-8')
 
+    # Картинки страницы (призы розыгрыша и т. п.) — рядом с index.html
+    if (ROOT / 'assets').is_dir():
+        shutil.copytree(ROOT / 'assets', DST_DIR / 'assets', dirs_exist_ok=True)
+
     # Same-origin JSON для periodic poll'а из браузера
     (DST_DIR / 'data.json').write_text(
         json.dumps(data, ensure_ascii=False, separators=(',', ':')),

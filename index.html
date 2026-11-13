@@ -228,6 +228,7 @@
          background: var(--pnl); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
   .prz-i { width: 46px; height: 46px; border-radius: 13px; background: var(--orA); color: var(--or);
              display: flex; align-items: center; justify-content: center; flex: none; }
+  .prz-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 12px; display: block; background: var(--orA); }
   .prz-t { font-size: 16px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
   .prz-t.none { font-size: 14.5px; font-weight: 500; color: var(--soft); }
   .rk { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
@@ -264,8 +265,13 @@
 const DEBT_BOT_USERNAME = 'nezefir_debt_bot';
 const BOT = `https://t.me/${DEBT_BOT_USERNAME}`;
 const MINIAPP_URL = `https://t.me/${DEBT_BOT_USERNAME}/debts`;
-// Призы розыгрыша «Пригласи друга»: всегда 4. Пустая строка — «Приз ещё не выбран».
-const RAFFLE_PRIZES = ['Набор из 10 дрип-пакетов', 'Брелок-кофемолка «Mahlkönig EK43»', '250 баллов на бонусную карту Lintu', ''];
+// Призы розыгрыша «Пригласи друга»: всегда 4. Пустое t — «Приз ещё не выбран»; img — фото из assets/.
+const RAFFLE_PRIZES = [
+  { t: 'Набор из 5 дрип-пакетов', img: 'assets/prize-drip.jpg' },
+  { t: 'Брелок-кофемолка «Mahlkönig EK43»' },
+  { t: '250 баллов на бонусную карту Lintu' },
+  { t: '' },
+];
 const LINTU_IOS     = 'https://apps.apple.com/ru/app/lintu/id6738983857';
 const LINTU_ANDROID = 'https://play.google.com/store/apps/details?id=com.linty.app';
 const LINTU_SITE    = 'https://lintu-coffee.ru';
@@ -853,7 +859,7 @@ function renderInvite() {
     <button type="button" class="btn" data-act="invite">${ic(I.send, 18, 2)}Получить мою ссылку</button>
     <div class="hot" style="padding:14px 16px 4px;display:flex;flex-direction:column">
       <div class="lbl sb"><span>РОЗЫГРЫШ МЕСЯЦА · 4 ПРИЗА</span><span class="or">ОТ НЕЗЕФИРА</span></div>
-      <div class="prz-grid">${RAFFLE_PRIZES.map((t, i) => `<div class="prz"><div class="lbl">ПРИЗ ${pad2(i + 1)}</div><div class="prz-i">${ic(I.gift, 22, 1.7)}</div><div class="prz-t${t ? '' : ' none'}">${t ? escapeHtml(t) : 'Приз ещё не выбран'}</div></div>`).join('')}</div>
+      <div class="prz-grid">${RAFFLE_PRIZES.map((p, i) => `<div class="prz"><div class="lbl">ПРИЗ ${pad2(i + 1)}</div>${p.img ? `<img class="prz-img" src="${p.img}" alt="" loading="lazy">` : `<div class="prz-i">${ic(I.gift, 22, 1.7)}</div>`}<div class="prz-t${p.t ? '' : ' none'}">${p.t ? escapeHtml(p.t) : 'Приз ещё не выбран'}</div></div>`).join('')}</div>
       <div class="soft" style="font-size:13.5px;line-height:1.4;padding-bottom:10px">4 победителя выбираются случайно из участников розыгрыша.</div>
     </div>
     <div class="pnl" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
