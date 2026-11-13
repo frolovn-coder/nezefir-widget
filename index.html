@@ -698,7 +698,7 @@ function renderSupport() {
     ${backLink()}
     ${header('N-04 · ПОДДЕРЖКА · 6 СПОСОБОВ', 'Поддержать')}
     <div class="hot" style="padding:16px;display:flex;flex-direction:column;gap:12px">
-      <div class="lbl sb"><span>01 · РОЗЫГРЫШ МЕСЯЦА</span><span class="or">ОТ НЕЗЕФИРА</span></div>
+      <div class="lbl sb"><span>01 · РОЗЫГРЫШ НЕЗЕФИР</span><span class="or">4 ПРИЗА</span></div>
       <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:19px;font-weight:600;line-height:1.25">Пригласи друга и выигрывай призы</div><div class="soft" style="font-size:13.5px;line-height:1.35">Друг подписался по твоей ссылке — и ты в розыгрыше. 4 приза каждый месяц.</div></div>
       <div class="thumbs">${RAFFLE_PRIZES.map(p => p.img ? `<img src="${p.img}" alt="">` : `<div>${ic(I.gift, 20, 1.7)}</div>`).join('')}</div>
       <button type="button" class="btn" data-go="invite">Участвовать</button>
@@ -859,7 +859,7 @@ function renderInvite() {
     <div class="soft" style="font-size:14px;line-height:1.4;padding:0 2px">Друг подписался на НЕЗЕФИР по твоей ссылке — и ты участвуешь в розыгрыше месяца.</div>
     <button type="button" class="btn" data-act="invite">${ic(I.send, 18, 2)}Получить мою ссылку</button>
     <div class="hot" style="padding:14px 16px 4px;display:flex;flex-direction:column">
-      <div class="lbl sb"><span>РОЗЫГРЫШ МЕСЯЦА · 4 ПРИЗА</span><span class="or">ОТ НЕЗЕФИРА</span></div>
+      <div class="lbl sb"><span>РОЗЫГРЫШ НЕЗЕФИР</span><span class="or">4 ПРИЗА КАЖДЫЙ МЕСЯЦ</span></div>
       <div class="prz-grid">${RAFFLE_PRIZES.map((p, i) => `<div class="prz"><div class="lbl">ПРИЗ ${pad2(i + 1)}</div>${p.img ? `<img class="prz-img" src="${p.img}" alt="" loading="lazy">` : `<div class="prz-i">${ic(I.gift, 22, 1.7)}</div>`}<div class="prz-t${p.t ? '' : ' none'}">${p.t ? escapeHtml(p.t) : 'Приз ещё не выбран'}</div></div>`).join('')}</div>
       <div class="soft" style="font-size:13.5px;line-height:1.4;padding-bottom:10px">4 победителя выбираются случайно из участников розыгрыша.</div>
     </div>
