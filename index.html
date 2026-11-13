@@ -232,7 +232,7 @@
   .prz-i { width: 46px; height: 46px; border-radius: 13px; background: var(--orA); color: var(--or);
              display: flex; align-items: center; justify-content: center; flex: none; }
   .prz-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 12px; display: block; background: var(--orA); }
-  .prz-t { font-size: 16px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+  .prz-t { font-size: clamp(14px, 4.1vw, 16px); font-weight: 600; line-height: 1.25; overflow-wrap: break-word; hyphens: auto; }
   .prz-t.none { font-size: 14.5px; font-weight: 500; color: var(--soft); }
   .rk { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
   .rk:last-child { border-bottom: none; }
@@ -273,7 +273,7 @@ const RAFFLE_PRIZES = [
   { t: 'Набор из 5 дрип-пакетов', img: 'assets/prize-drip.jpg' },
   { t: 'Брелок-кофемолка «Mahlkönig EK43»', img: 'assets/prize-keychain.jpg' },
   { t: '250 баллов на бонусную карту Lintu', img: 'assets/prize-points.jpg' },
-  { t: '' },
+  { t: 'Печенье «Юбилейное» с глазурью', img: 'assets/prize-cookies.jpg' },
 ];
 const LINTU_IOS     = 'https://apps.apple.com/ru/app/lintu/id6738983857';
 const LINTU_ANDROID = 'https://play.google.com/store/apps/details?id=com.linty.app';
