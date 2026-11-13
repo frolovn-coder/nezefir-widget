@@ -220,6 +220,9 @@
   .frow:last-child { border-bottom: none; }
 
   /* ─── ПРИГЛАСИ ДРУГА ────────────────────────────────────────────────── */
+  .rule { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.4; }
+  .rule b { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--blue); color: var(--hi);
+            font: 500 11px 'JetBrains Mono', monospace; display: flex; align-items: center; justify-content: center; }
   .prz-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 8px 0 12px; }
   .prz { box-sizing: border-box; min-height: 132px; padding: 12px; border-radius: 16px; border: 1px solid var(--line2);
          background: var(--pnl); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -853,7 +856,16 @@ function renderInvite() {
       <div class="prz-grid">${RAFFLE_PRIZES.map((t, i) => `<div class="prz"><div class="lbl">ПРИЗ ${pad2(i + 1)}</div><div class="prz-i">${ic(I.gift, 22, 1.7)}</div><div class="prz-t${t ? '' : ' none'}">${t ? escapeHtml(t) : 'Приз ещё не выбран'}</div></div>`).join('')}</div>
       <div class="soft" style="font-size:13.5px;line-height:1.4;padding-bottom:10px">4 победителя выбираются случайно из участников розыгрыша.</div>
     </div>
-    <div class="soft" style="font-size:13px;line-height:1.45;padding:0 2px">В розыгрыше: топ-10 тех, кто привёл больше всех подписчиков, и все, кто привёл хотя бы одного за последние 30 дней. Считаются только друзья, которые остались подписаны.</div>
+    <div class="pnl" style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+      <div class="lbl">КТО УЧАСТВУЕТ</div>
+      <div class="rule"><b>1</b><span>Все, кто привёл хотя бы одного друга за последние 30 дней</span></div>
+      <div class="rule"><b>2</b><span>Топ-10 тех, кто привёл больше всех за всё время</span></div>
+      <div class="rule"><b>3</b><span>Сами новые подписчики, пришедшие по ссылке друга за 30 дней</span></div>
+    </div>
+    <div class="pnl" style="padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+      <div class="lbl sb"><span>ЗАЩИТА ОТ НАКРУТКИ</span><span class="or">БЕЗ БОТОВ</span></div>
+      <div class="soft" style="font-size:13.5px;line-height:1.45">При вступлении бот просит нажать одну кнопку — пустые аккаунты отсекаются. Друг засчитывается через 3 дня, если остался подписан. Кто отписался и подписался снова — не считается.</div>
+    </div>
     ${topHtml}`);
 }
 
